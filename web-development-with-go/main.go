@@ -30,6 +30,8 @@ func pathHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		// TODO: handle the page not found error
 	}
+
+	// r.URL.Path vs r.URL.RawPath
 }
 
 func main() {

@@ -16,12 +16,24 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func pathHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, r.URL.Path)
+	// if r.URL.Path == "/" {
+	// 	homeHandler(w, r)
+	// } else if r.URL.Path == "/contact" {
+	// 	contactHandler(w, r)
+	// }
+
+	switch r.URL.Path {
+	case "/":
+		homeHandler(w, r)
+	case "/contact":
+		contactHandler(w, r)
+	default:
+		// TODO: handle the page not found error
+	}
 }
 
 func main() {
 	http.HandleFunc("/", pathHandler)
-	// http.HandleFunc("/contact", contactHandler)
 	fmt.Println("Starting the server on 3000...")
 	http.ListenAndServe(":3000", nil)
 }

@@ -11,4 +11,6 @@
 
 > go install github.com/cortesi/modd/cmd/modd@latest
 
-> modd (to run main.go with Dynamic Reloading)
+Run main.go with Dynamic Reloading
+
+> modd

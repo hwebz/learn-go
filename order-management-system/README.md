@@ -38,10 +38,11 @@ Kitchen Service
   -, Long running process of a "Simulated kitchen staff"
 ```
 
-## Technical Guide
+## Technical Guide 
 > cd common && go mod init github.com/hwebz/oms-commons
 > cd gateway && go mod init github.com/hwebz/oms-gateway
 > cd kitchen && go mod init github.com/hwebz/oms-kitchen
 > cd orders && go mod init github.com/hwebz/oms-orders
 > cd payments && go mod init github.com/hwebz/oms-payments
 > cd stock && go mod init github.com/hwebz/oms-stock
+> go work init ./common ./gateway ./kitchen ./orders ./payments ./stock

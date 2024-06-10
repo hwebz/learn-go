@@ -20,7 +20,7 @@ curl -L https://raw.githubusercontent.com/googleapis/googleapis/master/google/ty
 ### Install protoc-gen-go
 ```shell
 cd ..
-go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+go install google.golang.org/protobuf/cmd/protoc-gen-go
 ```
 
 ### Generate proto files
@@ -32,9 +32,15 @@ make protoc
 ```shell
 go get google.golang.org/protobuf # Go implementation for protocol buffers
 go get google.golang.org/genproto # Contains the generated Go packages for common protocol buffer types
+go get google.golang.org/grpc # for grpc generated codes
 ```
 
 ### Run main application
 ```shell
 make run
+```
+
+### Service definition compiler
+```shell
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 ```

@@ -7,5 +7,11 @@ protoc:
 		--grpc-gateway_opt generate_unbound_methods=true \
 		./**/*.proto
 
-run:
+server:
 	go run cmd/server/main.go
+
+gateway:
+	go run cmd/client/main.go
+
+run:
+	make server && make gateway

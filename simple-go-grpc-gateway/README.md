@@ -61,3 +61,11 @@ go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
 curl -L https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/annotations.proto -o proto/google/api/annotations.proto
 curl -L https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/http.proto -o proto/google/api/http.proto
 ```
+
+### Run Gateway and make request
+```shell
+make server
+make gateway
+
+curl -d "@data.json" -X POST -i http://localhost:8080/v0/orders
+```

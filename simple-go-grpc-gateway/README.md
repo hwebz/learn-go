@@ -69,3 +69,26 @@ make gateway
 
 curl -d "@data.json" -X POST -i http://localhost:8080/v0/orders
 ```
+
+### Sample order payload for adding/updating order
+```json
+{
+    "order": {
+        "order_id": 2,
+        "customer_id": 1,
+        "is_active": true,
+        "products": [
+          {
+            "product_id": "1",
+            "product_name": "CocaCola",
+            "product_type": "DRINK"
+          }
+        ],
+        "order_date": {
+            "year": 2024,
+            "month": 6,
+            "day": 12
+        }
+    }
+}
+```

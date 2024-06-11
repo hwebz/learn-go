@@ -65,10 +65,10 @@ func (d *DB) UpdateOrder(order *orders.Order) {
 
 // RemoveOrder removes an order from the orders collection
 func (d *DB) RemoveOrder(orderID uint64) {
-	filtered := make([]*orders.Order, 0, len(d.collection)-1)
-	for i := range d.collection {
-		if d.collection[i].OrderId != orderID {
-			filtered = append(filtered, d.collection[i])
+	filtered := make([]*orders.Order, 0, max(0, len(d.collection)-1))
+	for _, o := range d.collection {
+		if o.OrderId != orderID {
+			filtered = append(filtered, o)
 		}
 	}
 

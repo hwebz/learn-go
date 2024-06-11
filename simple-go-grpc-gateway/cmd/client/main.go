@@ -11,9 +11,12 @@ import (
 	"net/http"
 )
 
+// This variable is passed from Dockerfile as environment variable
+var orderServiceAddr string
+
 func main() {
 	// Set up a connection to the order server.
-	orderServiceAddr := "localhost:50051"
+	fmt.Println("Connecting to order service via", orderServiceAddr)
 	conn, err := grpc.Dial(orderServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Could not connect to order service: %v", err)

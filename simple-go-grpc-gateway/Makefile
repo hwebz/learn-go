@@ -15,3 +15,17 @@ gateway:
 
 run:
 	make server && make gateway
+
+down:
+	docker-compose down
+
+build:
+	docker-compose build
+
+up:
+	make down
+	docker-compose up -d
+
+up-fresh:
+	make build
+	make up

@@ -1,6 +1,9 @@
 ## Simple Go GRPC API Gateway
 Reference: https://www.koyeb.com/tutorials/build-a-grpc-api-using-go-and-grpc-gateway
 
+### API Gateway
+![img.png](images/api-gateway-diagram.png)
+
 ### Install Protobuf Compiler
 ```shell
 apt install -y protobuf-compiler

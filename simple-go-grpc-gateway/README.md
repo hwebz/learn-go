@@ -1,9 +1,6 @@
 ## Simple Go GRPC API Gateway
 Reference: https://www.koyeb.com/tutorials/build-a-grpc-api-using-go-and-grpc-gateway
 
-### API Gateway
-![img.png](images/api-gateway-diagram.png)
-
 ### Install Protobuf Compiler
 ```shell
 apt install -y protobuf-compiler
@@ -46,4 +43,21 @@ make run
 ### Service definition compiler
 ```shell
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+```
+
+## API Gateway
+![img.png](images/api-gateway-diagram.png)
+
+### Binaries need to install for API Gateway
+```shell
+go get github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
+go get github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
+go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
+go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
+```
+
+### Download 2 proto files from Google
+```shell
+curl -L https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/annotations.proto -o proto/google/api/annotations.proto
+curl -L https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/http.proto -o proto/google/api/http.proto
 ```

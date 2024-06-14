@@ -1,0 +1,57 @@
+{
+  "id": "",
+  "brand": "Dell",
+  "name": "Alienware",
+  "cpu": {
+    "brand": "Intel",
+    "name": "Core i7-7700K",
+    "number_cores": 4,
+    "number_threads": 7,
+    "min_ghz": 3.1206128606219714,
+    "max_ghz": 4.509665977702297
+  },
+  "ram": {
+    "value": "17",
+    "unit": "GIGABYTE"
+  },
+  "gpus": [{
+    "brand": "AMD",
+    "name": "RX 580",
+    "min_ghz": 1.312446749954773,
+    "max_ghz": 1.8270651452649156,
+    "memory": {
+      "value": "4",
+      "unit": "GIGABYTE"
+    }
+  }],
+  "storages": [{
+    "driver": "SSD",
+    "memory": {
+      "value": "763",
+      "unit": "GIGABYTE"
+    }
+  }, {
+    "driver": "HDD",
+    "memory": {
+      "value": "1",
+      "unit": "TERABYTE"
+    }
+  }],
+  "screen": {
+    "size_inch": 13.0,
+    "resolution": {
+      "width": 7461,
+      "height": 4197
+    },
+    "panel": "OLED",
+    "multitouch": false
+  },
+  "keyboard": {
+    "layout": "QWERTY",
+    "backlit": false
+  },
+  "weight_kg": 1.9327415441285594,
+  "price_usd": 1952.9430873484264,
+  "release_year": 2015,
+  "updated_at": "2024-06-14T07:47:50.160453Z"
+}

@@ -4,6 +4,7 @@ import "memory_message.proto";
 
 option go_package = "github.com/hwebz/go-grpc-guide";
 option java_package = "com.github.hwebz.grpc";
+option java_multiple_files = true;
 
 message Storage {
   enum Driver {

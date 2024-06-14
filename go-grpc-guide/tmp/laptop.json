@@ -1,0 +1,62 @@
+{
+  "id": "204afa73-1996-4fea-ad1f-0ef2ca64368e",
+  "brand": "Acer",
+  "name": "Predator",
+  "cpu": {
+    "brand": "AMD",
+    "name": "Ryzen 7 Pro 2700U",
+    "number_cores": 4,
+    "number_threads": 7,
+    "min_ghz": 2.0619346983153752,
+    "max_ghz": 3.7299149193649117
+  },
+  "ram": {
+    "value": "4",
+    "unit": "GIGABYTE"
+  },
+  "gpus": [
+    {
+      "brand": "NVIDIA",
+      "name": "RTX 3090",
+      "min_ghz": 1.3393687730727564,
+      "max_ghz": 1.7877216007583239,
+      "memory": {
+        "value": "2",
+        "unit": "GIGABYTE"
+      }
+    }
+  ],
+  "storages": [
+    {
+      "driver": "SSD",
+      "memory": {
+        "value": "425",
+        "unit": "GIGABYTE"
+      }
+    },
+    {
+      "driver": "HDD",
+      "memory": {
+        "value": "4",
+        "unit": "TERABYTE"
+      }
+    }
+  ],
+  "screen": {
+    "size_inch": 14.617491,
+    "resolution": {
+      "width": 4476,
+      "height": 2518
+    },
+    "panel": "OLED",
+    "multitouch": false
+  },
+  "keyboard": {
+    "layout": "QWERTY",
+    "backlit": true
+  },
+  "weight_kg": 2.464706824839361,
+  "price_usd": 1775.6289874992135,
+  "release_year": 2019,
+  "updated_at": "2024-06-14T07:09:37.138219048Z"
+}

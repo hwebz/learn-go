@@ -1,9 +1,6 @@
 package com.github.hwebz.service;
 
-import com.github.hwebz.grpc.CreateLaptopRequest;
-import com.github.hwebz.grpc.CreateLaptopResponse;
-import com.github.hwebz.grpc.Laptop;
-import com.github.hwebz.grpc.LaptopServiceGrpc;
+import com.github.hwebz.grpc.*;
 import io.grpc.Context;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -40,11 +37,11 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
         }
 
         // FOR TESTING: Simulate heavy processing
-        try {
-            TimeUnit.SECONDS.sleep(6);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            TimeUnit.SECONDS.sleep(6);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         // FOR TESTING: Client cancelled the request, we stop the server immediately
         if (Context.current().isCancelled()) {
@@ -69,5 +66,29 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
         responseObserver.onCompleted();
 
         logger.info("Saved laptop with ID: " + other.getId());
+    }
+
+    @Override
+    public void searchLaptop(SearchLaptopRequest request, StreamObserver<SearchLaptopResponse> responseObserver) {
+        Filter filter = request.getFilter();
+        logger.info("Got a search-laptop request with filter: \n" + filter);
+
+        store.Search(Context.current(), filter, new LaptopStream() {
+            @Override
+            public void Send(Laptop laptop) {
+                logger.info("Found laptop with ID: " + laptop.getId());
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                SearchLaptopResponse response = SearchLaptopResponse.newBuilder().setLaptop(laptop).build();
+                responseObserver.onNext(response);
+
+            }
+        });
+
+        responseObserver.onCompleted();
+        logger.info("Search laptop completed");
     }
 }

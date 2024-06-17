@@ -8,7 +8,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
-	"time"
 )
 
 type LaptopServer struct {
@@ -41,7 +40,7 @@ func (server *LaptopServer) CreateLaptop(
 	}
 
 	// FOR TESTING: Simulate heavy processing
-	time.Sleep(6 * time.Second)
+	//time.Sleep(6 * time.Second)
 
 	if ctx.Err() == context.Canceled {
 		log.Print("Request is cancelled")
@@ -70,4 +69,29 @@ func (server *LaptopServer) CreateLaptop(
 	}
 
 	return res, nil
+}
+
+func (server *LaptopServer) SearchLaptop(req *pb.SearchLaptopRequest, stream pb.LaptopService_SearchLaptopServer) error {
+	filter := req.GetFilter()
+	err := server.laptopStore.Search(
+		stream.Context(),
+		filter,
+		func(laptop *pb.Laptop) error {
+			res := &pb.SearchLaptopResponse{Laptop: laptop}
+
+			err := stream.Send(res)
+			if err != nil {
+				return err
+			}
+
+			log.Printf("Sent laptop with id: %s", laptop.GetId())
+			return nil
+		},
+	)
+
+	if err != nil {
+		return status.Errorf(codes.Internal, "Unexpected error: %v", err)
+	}
+
+	return nil
 }

@@ -25,7 +25,8 @@ func main() {
 	laptopClient := pb.NewLaptopServiceClient(conn)
 
 	laptop := sample.NewLaptop()
-	//laptop.Id = "c5d3c3a7-4af7-44ad-960c-e49c5f20c780" // Already exists
+	// laptop.Id = "15f1f70b-aa78-44e5-afcc-c656e42f89eb" // Already exists
+	// laptop.Id = "invalid-id"
 	req := &pb.CreateLaptopRequest{
 		Laptop: laptop,
 	}
@@ -45,4 +46,5 @@ func main() {
 	}
 
 	log.Printf("Created laptop with id: %s", res.Id)
+	time.Sleep(time.Second)
 }

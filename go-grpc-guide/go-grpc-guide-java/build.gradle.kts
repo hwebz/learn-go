@@ -20,6 +20,9 @@ dependencies {
     implementation("com.google.protobuf:protobuf-java-util:3.25.3")
     // https://mvnrepository.com/artifact/io.grpc/grpc-all
     implementation("io.grpc:grpc-all:1.64.0")
+    // https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
+
 
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"flag"
 	pb "github.com/hwebz/go-grpc-guide/pb"
@@ -10,14 +11,16 @@ import (
 	"google.golang.org/grpc/status"
 	"io"
 	"log"
+	"os"
+	"path/filepath"
 	"time"
 )
 
-func createLaptop(laptopClient pb.LaptopServiceClient) {
-	laptop := sample.NewLaptop()
+func createLaptop(laptopClient pb.LaptopServiceClient, laptop *pb.Laptop) {
+	//laptop := sample.NewLaptop()
 	// laptop.Id = "15f1f70b-aa78-44e5-afcc-c656e42f89eb" // Already exists
 	// laptop.Id = "invalid-id"
-	laptop.Id = ""
+	//laptop.Id = ""
 	req := &pb.CreateLaptopRequest{
 		Laptop: laptop,
 	}
@@ -74,20 +77,13 @@ func searchLaptop(laptopClient pb.LaptopServiceClient, filter *pb.Filter) {
 	}
 }
 
-func main() {
-	serverAddress := flag.String("address", "", "the server address")
-	flag.Parse()
-	log.Printf("dial server %s", *serverAddress)
+func testCreateLaptop(laptopClient pb.LaptopServiceClient) {
+	createLaptop(laptopClient, sample.NewLaptop())
+}
 
-	conn, err := grpc.Dial(*serverAddress, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("fail to dial: %v", err)
-	}
-
-	laptopClient := pb.NewLaptopServiceClient(conn)
-
+func testSearchLaptop(laptopClient pb.LaptopServiceClient) {
 	for i := 0; i < 10; i++ {
-		createLaptop(laptopClient)
+		createLaptop(laptopClient, sample.NewLaptop())
 	}
 
 	filter := &pb.Filter{
@@ -101,5 +97,89 @@ func main() {
 	}
 
 	searchLaptop(laptopClient, filter)
+}
+
+func testUploadImage(laptopClient pb.LaptopServiceClient) {
+	laptop := sample.NewLaptop()
+	createLaptop(laptopClient, laptop)
+	uploadImage(laptopClient, laptop.GetId(), "tmp/laptop.png")
+}
+
+func uploadImage(laptopClient pb.LaptopServiceClient, laptopID string, imagePath string) {
+	file, err := os.Open(imagePath)
+	if err != nil {
+		log.Fatal("Cannot open image file: ", err)
+	}
+	defer file.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	stream, err := laptopClient.UploadImage(ctx)
+	if err != nil {
+		log.Fatal("Cannot upload image: ", err)
+	}
+
+	req := &pb.UploadImageRequest{
+		Data: &pb.UploadImageRequest_Info{
+			Info: &pb.ImageInfo{
+				LaptopId:  laptopID,
+				ImageType: filepath.Ext(imagePath),
+			},
+		},
+	}
+
+	err = stream.Send(req)
+	if err != nil {
+		log.Fatal("Cannot send image info: ", err)
+	}
+
+	reader := bufio.NewReader(file)
+	buffer := make([]byte, 1024)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal("Cannot read chunk to buffer: ", err)
+		}
+
+		req := &pb.UploadImageRequest{
+			Data: &pb.UploadImageRequest_ChunkData{
+				ChunkData: buffer[:n],
+			},
+		}
+
+		err = stream.Send(req)
+		if err != nil {
+			log.Fatal("Cannot send chunk to server: ", err, stream.RecvMsg(nil))
+		}
+	}
+
+	res, err := stream.CloseAndRecv()
+	if err != nil {
+		log.Fatal("Cannot receive response: ", err, stream.RecvMsg(nil))
+	}
+
+	log.Printf("Image uploaded with id: %s, size: %d", res.GetId(), res.GetSize())
+}
+
+func main() {
+	serverAddress := flag.String("address", "", "the server address")
+	flag.Parse()
+	log.Printf("dial server %s", *serverAddress)
+
+	conn, err := grpc.Dial(*serverAddress, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("fail to dial: %v", err)
+	}
+
+	laptopClient := pb.NewLaptopServiceClient(conn)
+	//testCreateLaptop(laptopClient)
+	//testSearchLaptop(laptopClient)
+	testUploadImage(laptopClient)
+
 	time.Sleep(time.Second)
 }

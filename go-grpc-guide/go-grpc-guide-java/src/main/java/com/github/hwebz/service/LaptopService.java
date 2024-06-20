@@ -100,6 +100,8 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
     @Override
     public StreamObserver<UploadImageRequest> uploadImage(StreamObserver<UploadImageResponse> responseObserver) {
         return new StreamObserver<UploadImageRequest>() {
+//            private static final int maxImageSize = 1 << 10; // 1Kb FOR TESTING
+            private static final int maxImageSize = 1 << 20; // 1Mb
             private String laptopID;
             private String imageType;
             private ByteArrayOutputStream imageData;
@@ -114,6 +116,16 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
                     imageType = info.getImageType();
                     imageData = new ByteArrayOutputStream();
 
+                    // Check laptop exists
+                    Laptop found = laptopStore.Find(laptopID);
+                    if (found == null) {
+                        responseObserver.onError(
+                                Status.NOT_FOUND
+                                        .withDescription("Laptop not found")
+                                        .asRuntimeException()
+                        );
+                    }
+
                     return;
                 }
 
@@ -125,6 +137,17 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
                     responseObserver.onError(
                             Status.INVALID_ARGUMENT
                                     .withDescription("Image info wasn't sent before")
+                                    .asRuntimeException()
+                    );
+                    return;
+                }
+
+                int size = imageData.size() + chunkData.size();
+                if (size > maxImageSize) {
+                    logger.info("Image is too large: " + size);
+                    responseObserver.onError(
+                            Status.INVALID_ARGUMENT
+                                    .withDescription("Image is too large: " + size)
                                     .asRuntimeException()
                     );
                     return;

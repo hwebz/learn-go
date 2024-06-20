@@ -173,7 +173,7 @@ public class LaptopClient {
 
             // Test upload laptop image
             Laptop laptop = generator.NewLaptop();
-            client.createLaptop(laptop);
+            client.createLaptop(laptop); // commented out FOR TESTING "Laptop not found"
             client.uploadImage(laptop.getId(), "tmp/laptop.png");
         } finally {
             client.shutdown();

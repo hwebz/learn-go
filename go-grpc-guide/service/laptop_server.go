@@ -18,12 +18,14 @@ type LaptopServer struct {
 	pb.UnimplementedLaptopServiceServer
 	laptopStore LaptopStore
 	imageStore  ImageStore
+	ratingStore RatingStore
 }
 
-func NewLaptopServer(laptopStore LaptopStore, imageStore ImageStore) *LaptopServer {
+func NewLaptopServer(laptopStore LaptopStore, imageStore ImageStore, ratingStore RatingStore) *LaptopServer {
 	return &LaptopServer{
 		laptopStore: laptopStore,
 		imageStore:  imageStore,
+		ratingStore: ratingStore,
 	}
 }
 
@@ -184,6 +186,58 @@ func (server *LaptopServer) UploadImage(stream pb.LaptopService_UploadImageServe
 	}
 
 	log.Printf("Save image with id: %s, size: %d", imageID, imageSize)
+	return nil
+}
+
+// RateLaptop is a bidirectional-streaming RPC that allows client to rate a stream of laptops
+// with a score, and returns a stream of average score for each of them
+func (server *LaptopServer) RateLaptop(stream pb.LaptopService_RateLaptopServer) error {
+	for {
+		err := contextError(stream.Context())
+		if err != nil {
+			return err
+		}
+
+		req, err := stream.Recv()
+		if err == io.EOF {
+			log.Print("No more data")
+			break
+		}
+
+		if err != nil {
+			return logError(status.Errorf(codes.Unknown, "Cannot receive stream request: %v", err))
+		}
+
+		laptopID := req.GetLaptopId()
+		score := req.GetScore()
+
+		log.Printf("Received a rate laptop with id: %s, score = %.2f", laptopID, score)
+
+		found, err := server.laptopStore.Find(laptopID)
+		if err != nil {
+			return logError(status.Errorf(codes.Internal, "Cannot find laptop: %v", err))
+		}
+		if found == nil {
+			return logError(status.Errorf(codes.InvalidArgument, "Laptop %s doesn't exist", laptopID))
+		}
+
+		rating, err := server.ratingStore.Add(laptopID, score)
+		if err != nil {
+			return logError(status.Errorf(codes.Internal, "Cannot add rating: %v", err))
+		}
+
+		res := &pb.RateLaptopResponse{
+			LaptopId:     laptopID,
+			RatedCount:   rating.Count,
+			AverageScore: rating.Sum / float64(rating.Count),
+		}
+
+		err = stream.Send(res)
+		if err != nil {
+			return logError(status.Errorf(codes.Unknown, "Cannot send response: %v", err))
+		}
+	}
+
 	return nil
 }
 

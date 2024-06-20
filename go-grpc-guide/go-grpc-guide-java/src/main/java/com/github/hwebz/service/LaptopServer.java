@@ -2,6 +2,7 @@ package com.github.hwebz.service;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.protobuf.services.ProtoReflectionService;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +22,10 @@ public class LaptopServer {
     public LaptopServer(ServerBuilder serverBuilder, int port, LaptopStore laptopStore, ImageStore imageStore, RatingStore ratingStore) {
         this.port = port;
         LaptopService laptopService = new LaptopService(laptopStore, imageStore, ratingStore);
-        server = serverBuilder.addService(laptopService).build();
+        server = serverBuilder.addService(laptopService)
+                // gRPC Reflection CLI
+                .addService(ProtoReflectionService.newInstance())
+                .build();
     }
 
     public void start() throws IOException {

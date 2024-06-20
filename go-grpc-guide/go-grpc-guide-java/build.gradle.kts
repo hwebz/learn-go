@@ -22,8 +22,8 @@ dependencies {
     implementation("io.grpc:grpc-all:1.64.0")
     // https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api
     implementation("javax.annotation:javax.annotation-api:1.3.2")
-
-
+    // https://mvnrepository.com/artifact/io.grpc/grpc-services
+    runtimeOnly("io.grpc:grpc-services:1.62.2")
 }
 
 sourceSets {

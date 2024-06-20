@@ -15,3 +15,7 @@ server:
 
 client:
 	go run cmd/client/main.go -address 0.0.0.0:8089
+
+evans:
+	#go install github.com/ktr0731/evans@latest
+	evans -r repl -p 8089

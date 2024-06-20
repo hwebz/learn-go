@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.sql.Time;
 import java.util.Iterator;
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -147,6 +148,106 @@ public class LaptopClient {
         }
     }
 
+    public void rateLaptop(String[] laptopIDs, double[] scores) throws InterruptedException {
+        CountDownLatch finishLatch = new CountDownLatch(1);
+        StreamObserver<RateLaptopRequest> requestStreamObserver = asyncStub.withDeadlineAfter(5, TimeUnit.SECONDS)
+                .rateLaptop(new StreamObserver<RateLaptopResponse>() {
+                    @Override
+                    public void onNext(RateLaptopResponse rateLaptopResponse) {
+                        logger.info("laptop rate id: " + rateLaptopResponse.getLaptopId() +
+                                ", count = " + rateLaptopResponse.getRatedCount() +
+                                ", average = " + rateLaptopResponse.getAverageScore());
+                    }
+
+                    @Override
+                    public void onError(Throwable throwable) {
+                        logger.log(Level.SEVERE, "Rate laptop failed: " + throwable.getMessage());
+                        finishLatch.countDown();
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                        logger.info("Rate laptop completed");
+                        finishLatch.countDown();
+                    }
+                });
+        int n = laptopIDs.length;
+        try {
+            for (int i = 0; i < n; i++) {
+                RateLaptopRequest request = RateLaptopRequest.newBuilder()
+                        .setLaptopId(laptopIDs[i])
+                        .setScore(scores[i])
+                        .build();
+                requestStreamObserver.onNext(request);
+                logger.info("Sent rate laptop request with id = " + request.getLaptopId() + ", score = " + request.getScore());
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Unexpected error: " + e.getMessage());
+            requestStreamObserver.onError(e);
+            return;
+        }
+
+        requestStreamObserver.onCompleted();
+        if (!finishLatch.await(1, TimeUnit.MINUTES)) {
+            logger.warning("Request cannot finish within 1 minute");
+        }
+    }
+
+    public static void testCreateLaptop(LaptopClient client, Generator generator) {
+        Laptop laptop = generator.NewLaptop();
+        client.createLaptop(laptop);
+    }
+
+    public static void testSearchLaptop(LaptopClient client, Generator generator) {
+        for (int i = 0; i < 10; i++) {
+            Laptop laptop = generator.NewLaptop();
+            client.createLaptop(laptop);
+        }
+
+        Memory minRam = Memory.newBuilder().setValue(4).setUnit(Memory.Unit.GIGABYTE).build();
+        Filter filter = Filter.newBuilder()
+                .setMaxPriceUsd(3000)
+                .setMinCpuCores(4)
+                .setMinCpuGhz(2.0)
+                .setMinRam(minRam)
+                .build();
+
+        client.searchLaptop(filter);
+    }
+
+    public static void testUploadImage(LaptopClient client, Generator generator) throws InterruptedException {
+        Laptop laptop = generator.NewLaptop();
+        client.createLaptop(laptop); // commented out FOR TESTING "Laptop not found"
+        client.uploadImage(laptop.getId(), "tmp/laptop.png");
+    }
+
+    public static void testRateLaptop(LaptopClient client, Generator generator) throws InterruptedException {
+        int n = 3;
+        String[] laptopIDs = new String[n];
+
+        for (int i = 0; i < n; i++) {
+            Laptop laptop = generator.NewLaptop();
+            laptopIDs[i] = laptop.getId();
+            client.createLaptop(laptop);
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            logger.info("Rate laptop (y/n)?");
+            String answer = scanner.nextLine();
+            if (!answer.toLowerCase().trim().equals("y")) {
+                break;
+            }
+
+            double[] scores = new double[n];
+            for (int i = 0; i < n; i++) {
+                scores[i] = generator.randomLaptopScore();
+            }
+
+            client.rateLaptop(laptopIDs, scores);
+        }
+    }
+
     public static void main(String[] args) throws InterruptedException {
         LaptopClient client = new LaptopClient("0.0.0.0", 8089);
 
@@ -156,25 +257,10 @@ public class LaptopClient {
         // Laptop laptop = generator.NewLaptop().toBuilder().setId("invalid-uuid").build(); // Invalid ID/home/vinai/learning/learn-go/go-grpc-guide/tmp/laptop.png
 
         try {
-//            for (int i = 0; i < 10; i++) {
-//                Laptop laptop = generator.NewLaptop();
-//                client.createLaptop(laptop);
-//            }
-//
-//            Memory minRam = Memory.newBuilder().setValue(4).setUnit(Memory.Unit.GIGABYTE).build();
-//            Filter filter = Filter.newBuilder()
-//                    .setMaxPriceUsd(3000)
-//                    .setMinCpuCores(4)
-//                    .setMinCpuGhz(2.0)
-//                    .setMinRam(minRam)
-//                    .build();
-//
-//            client.searchLaptop(filter);
-
-            // Test upload laptop image
-            Laptop laptop = generator.NewLaptop();
-            client.createLaptop(laptop); // commented out FOR TESTING "Laptop not found"
-            client.uploadImage(laptop.getId(), "tmp/laptop.png");
+//            testCreateLaptop(client, generator);
+//            testSearchLaptop(client, generator);
+//            testUploadImage(client, generator);
+            testRateLaptop(client, generator);
         } finally {
             client.shutdown();
         }

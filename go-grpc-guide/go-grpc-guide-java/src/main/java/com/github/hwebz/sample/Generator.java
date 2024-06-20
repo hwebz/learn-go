@@ -246,6 +246,10 @@ public class Generator {
         }
     }
 
+    public double randomLaptopScore() {
+        return randomDouble(1.0, 10.0);
+    }
+
     public static void main(String[] args) {
         Generator g = new Generator();
         Laptop laptop = g.NewLaptop();

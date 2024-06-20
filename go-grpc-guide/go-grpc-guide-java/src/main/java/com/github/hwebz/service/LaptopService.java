@@ -16,10 +16,12 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
     private static final Logger logger = Logger.getLogger(LaptopService.class.getName());
     private final LaptopStore laptopStore;
     private final ImageStore imageStore;
+    private final RatingStore ratingStore;
 
-    public LaptopService(LaptopStore laptopStore, ImageStore imageStore) {
+    public LaptopService(LaptopStore laptopStore, ImageStore imageStore, RatingStore ratingStore) {
         this.laptopStore = laptopStore;
         this.imageStore = imageStore;
+        this.ratingStore = ratingStore;
     }
 
     @Override
@@ -190,6 +192,48 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
                         .setSize(imageSize)
                         .build();
                 responseObserver.onNext(response);
+                responseObserver.onCompleted();
+            }
+        };
+    }
+
+    @Override
+    public StreamObserver<RateLaptopRequest> rateLaptop(StreamObserver<RateLaptopResponse> responseObserver) {
+        return new StreamObserver<RateLaptopRequest>() {
+            @Override
+            public void onNext(RateLaptopRequest rateLaptopRequest) {
+                String laptopID = rateLaptopRequest.getLaptopId();
+                double score = rateLaptopRequest.getScore();
+
+                logger.info("Received rate laptop with ID: " + laptopID + ", score: " + score);
+
+                Laptop found = laptopStore.Find(laptopID);
+                if (found == null) {
+                    responseObserver.onError(
+                            Status.NOT_FOUND
+                                    .withDescription("Laptop not found")
+                                    .asRuntimeException()
+                    );
+                    return;
+                }
+
+                Rating rating = ratingStore.Add(laptopID, score);
+                RateLaptopResponse response = RateLaptopResponse.newBuilder()
+                        .setLaptopId(laptopID)
+                        .setRatedCount(rating.getCount())
+                        .setAverageScore(rating.getSum() / rating.getCount())
+                        .build();
+
+                responseObserver.onNext(response);
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                logger.warning(throwable.getMessage());
+            }
+
+            @Override
+            public void onCompleted() {
                 responseObserver.onCompleted();
             }
         };

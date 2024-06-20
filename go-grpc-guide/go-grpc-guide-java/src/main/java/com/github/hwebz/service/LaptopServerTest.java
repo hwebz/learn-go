@@ -33,7 +33,7 @@ public class LaptopServerTest {
 
         laptopStore = new InMemoryLaptopStore();
         imageStore = new DiskImageStore("img");
-        server = new LaptopServer(serverBuilder, 0, laptopStore, imageStore);
+        server = new LaptopServer(serverBuilder, 0, laptopStore, imageStore, null);
         server.start();
 
         channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build());

@@ -21,7 +21,8 @@ public class LaptopServerTest {
     @Rule
     public final GrpcCleanupRule grpcCleanup = new GrpcCleanupRule(); // automatically graceful shutdown channel at the end of test
 
-    private LaptopStore store;
+    private LaptopStore laptopStore;
+    private ImageStore imageStore;
     private LaptopServer server;
     private ManagedChannel channel;
 
@@ -30,8 +31,9 @@ public class LaptopServerTest {
         String serverName = InProcessServerBuilder.generateName();
         InProcessServerBuilder serverBuilder = InProcessServerBuilder.forName(serverName).directExecutor();
 
-        store = new InMemoryLaptopStore();
-        server = new LaptopServer(serverBuilder, 0, store);
+        laptopStore = new InMemoryLaptopStore();
+        imageStore = new DiskImageStore("img");
+        server = new LaptopServer(serverBuilder, 0, laptopStore, imageStore);
         server.start();
 
         channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build());
@@ -53,7 +55,7 @@ public class LaptopServerTest {
         assertNotNull(response);
         assertEquals(laptop.getId(), response.getId());
 
-        Laptop found = store.Find(response.getId());
+        Laptop found = laptopStore.Find(response.getId());
         assertNotNull(found);
     }
 
@@ -68,7 +70,7 @@ public class LaptopServerTest {
         assertNotNull(response);
         assertFalse(response.getId().isEmpty());
 
-        Laptop found = store.Find(response.getId());
+        Laptop found = laptopStore.Find(response.getId());
         assertNotNull(found);
     }
 
@@ -76,7 +78,7 @@ public class LaptopServerTest {
     public void createLaptopWithAnInvalidID() throws Exception {
         Generator generator = new Generator();
         Laptop laptop = generator.NewLaptop().toBuilder().setId("invalid-id").build();
-        store.Save(laptop);
+        laptopStore.Save(laptop);
         CreateLaptopRequest request = CreateLaptopRequest.newBuilder().setLaptop(laptop).build();
 
         LaptopServiceGrpc.LaptopServiceBlockingStub stub = LaptopServiceGrpc.newBlockingStub(channel);
@@ -87,7 +89,7 @@ public class LaptopServerTest {
     public void createLaptopWithAnAlreadyExistsID() throws Exception {
         Generator generator = new Generator();
         Laptop laptop = generator.NewLaptop();
-        store.Save(laptop);
+        laptopStore.Save(laptop);
         CreateLaptopRequest request = CreateLaptopRequest.newBuilder().setLaptop(laptop).build();
 
         LaptopServiceGrpc.LaptopServiceBlockingStub stub = LaptopServiceGrpc.newBlockingStub(channel);

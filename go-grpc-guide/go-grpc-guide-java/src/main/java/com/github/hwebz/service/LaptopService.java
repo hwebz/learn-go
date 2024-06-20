@@ -1,20 +1,25 @@
 package com.github.hwebz.service;
 
 import com.github.hwebz.grpc.*;
+import com.google.protobuf.ByteString;
 import io.grpc.Context;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
     private static final Logger logger = Logger.getLogger(LaptopService.class.getName());
-    private LaptopStore store;
+    private final LaptopStore laptopStore;
+    private final ImageStore imageStore;
 
-    public LaptopService(LaptopStore store) {
-        this.store = store;
+    public LaptopService(LaptopStore laptopStore, ImageStore imageStore) {
+        this.laptopStore = laptopStore;
+        this.imageStore = imageStore;
     }
 
     @Override
@@ -52,7 +57,7 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
 
         Laptop other = laptop.toBuilder().setId(uuid.toString()).build();
         try {
-            store.Save(other);
+            laptopStore.Save(other);
         } catch (AlreadyExistsException e) {
             responseObserver.onError(Status.ALREADY_EXISTS.withDescription(e.getMessage()).asRuntimeException());
             return;
@@ -73,7 +78,7 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
         Filter filter = request.getFilter();
         logger.info("Got a search-laptop request with filter: \n" + filter);
 
-        store.Search(Context.current(), filter, new LaptopStream() {
+        laptopStore.Search(Context.current(), filter, new LaptopStream() {
             @Override
             public void Send(Laptop laptop) {
                 logger.info("Found laptop with ID: " + laptop.getId());
@@ -90,5 +95,80 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
 
         responseObserver.onCompleted();
         logger.info("Search laptop completed");
+    }
+
+    @Override
+    public StreamObserver<UploadImageRequest> uploadImage(StreamObserver<UploadImageResponse> responseObserver) {
+        return new StreamObserver<UploadImageRequest>() {
+            private String laptopID;
+            private String imageType;
+            private ByteArrayOutputStream imageData;
+
+            @Override
+            public void onNext(UploadImageRequest uploadImageRequest) {
+                if (uploadImageRequest.getDataCase() == UploadImageRequest.DataCase.INFO) {
+                    ImageInfo info = uploadImageRequest.getInfo();
+                    logger.info("Receive image info: " + info);
+
+                    laptopID = info.getLaptopId();
+                    imageType = info.getImageType();
+                    imageData = new ByteArrayOutputStream();
+
+                    return;
+                }
+
+                ByteString chunkData = uploadImageRequest.getChunkData();
+                logger.info("Receive image chunk with size: " + chunkData.size());
+
+                if (imageData == null) {
+                    logger.info("Image info wasn't sent before");
+                    responseObserver.onError(
+                            Status.INVALID_ARGUMENT
+                                    .withDescription("Image info wasn't sent before")
+                                    .asRuntimeException()
+                    );
+                    return;
+                }
+
+                try {
+                    chunkData.writeTo(imageData);
+                } catch (IOException e) {
+                    responseObserver.onError(
+                            Status.INTERNAL
+                                    .withDescription("Cannot write chunk data: " + e.getMessage())
+                                    .asRuntimeException()
+                    );
+                    return;
+                }
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                logger.warning(throwable.getMessage());
+            }
+
+            @Override
+            public void onCompleted() {
+                String imageID = "";
+                int imageSize = imageData.size();
+
+                try {
+                    imageID = imageStore.Save(laptopID, imageType, imageData);
+                } catch (IOException e) {
+                    responseObserver.onError(
+                            Status.INTERNAL
+                                    .withDescription("Cannot sav eimage to the store: " + e.getMessage())
+                                    .asRuntimeException()
+                    );
+                }
+
+                UploadImageResponse response = UploadImageResponse.newBuilder()
+                        .setId(imageID)
+                        .setSize(imageSize)
+                        .build();
+                responseObserver.onNext(response);
+                responseObserver.onCompleted();
+            }
+        };
     }
 }

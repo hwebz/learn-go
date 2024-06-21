@@ -20,7 +20,4 @@ evans:
 	#go install github.com/ktr0731/evans@latest
 	evans -r repl -p 8089
 
-test:
-	go test -cover -race ./..
-
 .PHONY: gen clean server run client evans test

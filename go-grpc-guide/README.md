@@ -137,3 +137,12 @@ Youtube playlist: [Link to the course](https://www.youtube.com/watch?v=O8Yu7JwkF
   - Excellent support for bidirectional streaming
 - Network constrained environments
   - Lightweight message format
+
+## Secure gRPC connection with SSL/TLS
+3 types of gRPC connections
+- Insecure
+  - Plain text data. No encryption. Don't use it for production
+- Server-side TLS
+  - Encrypted data. Only server needs to provide its certificate to client
+- Mutual TLS
+  - Encrypted data. Both server and client need to provide certificates to each others

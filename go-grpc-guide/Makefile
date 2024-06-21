@@ -20,4 +20,7 @@ evans:
 	#go install github.com/ktr0731/evans@latest
 	evans -r repl -p 8089
 
-.PHONY: gen clean server run client evans test
+cert:
+	cd cert; sh gen.sh; cd ..
+
+.PHONY: gen clean server run client evans test cert

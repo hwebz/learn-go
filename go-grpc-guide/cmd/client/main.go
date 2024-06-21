@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"fmt"
 	"github.com/hwebz/go-grpc-guide/client"
@@ -8,6 +10,8 @@ import (
 	"github.com/hwebz/go-grpc-guide/sample"
 	"github.com/hwebz/go-grpc-guide/service"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"io/ioutil"
 	"log"
 	"strings"
 	"time"
@@ -87,12 +91,40 @@ func authMethods() map[string]bool {
 	}
 }
 
+func loadTLSCredentials() (credentials.TransportCredentials, error) {
+	// Load certificate of the CA who signed server's certificate
+	pemServerCA, err := ioutil.ReadFile("cert/ca-cert.pem")
+	if err != nil {
+		return nil, err
+	}
+
+	certPool := x509.NewCertPool()
+	if !certPool.AppendCertsFromPEM(pemServerCA) {
+		return nil, fmt.Errorf("Failed to add server CA's certificate")
+	}
+
+	// Create the credentials and return it
+	config := &tls.Config{
+		RootCAs: certPool,
+	}
+
+	return credentials.NewTLS(config), nil
+}
+
 func main() {
 	serverAddress := flag.String("address", "", "the server address")
 	flag.Parse()
 	log.Printf("dial server %s", *serverAddress)
 
-	authConn, err := grpc.Dial(*serverAddress, grpc.WithInsecure())
+	tlsCredentials, err := loadTLSCredentials()
+	if err != nil {
+		log.Fatal("Cannot load TLS credentials: ", err)
+	}
+
+	authConn, err := grpc.Dial(
+		*serverAddress,
+		grpc.WithTransportCredentials(tlsCredentials),
+	)
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}
@@ -105,7 +137,7 @@ func main() {
 
 	conn, err := grpc.Dial(
 		*serverAddress,
-		grpc.WithInsecure(),
+		grpc.WithTransportCredentials(tlsCredentials),
 		grpc.WithUnaryInterceptor(interceptor.Unary()),
 		grpc.WithStreamInterceptor(interceptor.Stream()),
 	)

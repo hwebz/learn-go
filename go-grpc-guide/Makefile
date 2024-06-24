@@ -42,6 +42,6 @@ cert:
 	cd cert; sh gen.sh; cd ..
 
 rest:
-	go run cmd/server/main.go -port 8091 -type rest
+	go run cmd/server/main.go -port 8091 -type rest -endpoint 0.0.0.0:8089
 
 .PHONY: gen clean server run client evans test cert

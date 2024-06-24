@@ -13,8 +13,26 @@ test:
 server:
 	go run cmd/server/main.go -port 8089
 
+server1:
+	go run cmd/server/main.go -port 8090
+
+server-tls:
+	go run cmd/server/main.go -port 8089 -tls
+
+server1-tls:
+	go run cmd/server/main.go -port 8090 -tls
+
 client:
 	go run cmd/client/main.go -address 0.0.0.0:8089
+
+client-tls:
+	go run cmd/client/main.go -address 0.0.0.0:8089 -tls
+
+client-lb:
+	go run cmd/client/main.go -address 0.0.0.0:8080
+
+client-lb-tls:
+	go run cmd/client/main.go -address 0.0.0.0:8080 -tls
 
 evans:
 	#go install github.com/ktr0731/evans@latest

@@ -153,3 +153,9 @@ Youtube playlist: [Link to the course](https://www.youtube.com/watch?v=O8Yu7JwkF
 - Copy all files (with certificate files) under /nginx to /usr/local/etc/nginx/
 - Run 2 servers: 8089, 8090 that proxy by 8080 port from nginx for load balancing
 - Client should connect to nginx 8080 port instead of individual server
+
+## Generate RESTful service and swagger documentation with gRPC gateway
+```shell
+go get -u github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
+go get -u github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-swagger
+```

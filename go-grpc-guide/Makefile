@@ -1,5 +1,5 @@
 gen:
-	protoc --proto_path=proto proto/*.proto --go_out=pb --go_opt=paths=source_relative --go-grpc_out=pb --go-grpc_opt=paths=source_relative
+	protoc --proto_path=proto proto/*.proto --go_out=pb --go_opt=paths=source_relative --go-grpc_out=pb --go-grpc_opt=paths=source_relative --grpc-gateway_out=pb --grpc-gateway_opt=paths=source_relative --grpc-gateway_opt=generate_unbound_methods=true --openapiv2_out=swagger
 
 clean:
 	rm pb/*.go
@@ -40,5 +40,8 @@ evans:
 
 cert:
 	cd cert; sh gen.sh; cd ..
+
+rest:
+	go run cmd/server/main.go -port 8091 -type rest
 
 .PHONY: gen clean server run client evans test cert

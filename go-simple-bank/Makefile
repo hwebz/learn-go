@@ -25,5 +25,8 @@ down:
 build:
 	docker-compose build
 
-.PHONY: postgres createdb dropdb migrateup migratedown up down build
+sqlc:
+	sqlc generate
+
+.PHONY: postgres createdb dropdb migrateup migratedown up down build sqlc
 

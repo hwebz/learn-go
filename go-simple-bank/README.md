@@ -6,3 +6,9 @@ Youtube Playlist: https://www.youtube.com/watch?v=TtCfDXfSw_0&list=PLy_6D98if3UL
 2. Docker
 3. golang-migrate ([Guide](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate))
 4. sqlc ([Guide](https://docs.sqlc.dev/en/latest/overview/install.html))
+
+### Init sqlc
+> sqlc init
+
+### Generate code using sqlc
+> make sqlc

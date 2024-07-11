@@ -1,5 +1,5 @@
 postgres:
-	docker run --name postgres12 -p 5432:5432 -e POSTGRES_USER=root -i POSTGRES_PASSWORD=secret -d postgres:12-alpine
+	docker run --name postgres12 -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:12-alpine
 
 createdb:
 	docker exec -it postgres12 createdb --username=root --owner=root simple_bank
@@ -16,5 +16,14 @@ migratedown:
 migratecreate:
 	migrate create -ext sql -dir db/migration -seq init_schema
 
-.PHONY: postgres createdb dropdb migrateup migratedown
+up:
+	docker-compose up -d
+
+down:
+	docker-compose down
+
+build:
+	docker-compose build
+
+.PHONY: postgres createdb dropdb migrateup migratedown up down build
 

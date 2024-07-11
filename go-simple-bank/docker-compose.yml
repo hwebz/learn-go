@@ -4,7 +4,7 @@ services:
   database:
     image: postgres:12-alpine
     environment:
-      POSTGRES_USER: root
+      POSTGRES_USER: myuser
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: simple_bank
     volumes:
@@ -12,7 +12,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root"]
+      test: ["CMD-SHELL", "pg_isready -h database -U myuser"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,7 +23,7 @@ services:
       - ./db/migration:/migrations
     command: [
       "-path", "/migrations",
-      "-database", "postgres://root:secret@db:5432/simple_bank?sslmode=disable",
+      "-database", "postgres://myuser:secret@database:5432/simple_bank?sslmode=disable",
       "up"
     ]
     depends_on:
@@ -38,8 +38,8 @@ services:
       - database
       - migrate
     environment:
-      DB_HOST: db
+      DB_HOST: database
       DB_PORT: 5432
-      DB_USER: root
+      DB_USER: myuser
       DB_PASSWORD: secret
       DB_NAME: simple_bank

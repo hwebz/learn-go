@@ -27,6 +27,7 @@ services:
     volumes:
       - ./servers.json:/pgadmin4/servers.json
 
+ # Migrate database at startup
   migrate:
     image: migrate/migrate
     volumes:

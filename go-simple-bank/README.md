@@ -12,3 +12,18 @@ Youtube Playlist: https://www.youtube.com/watch?v=TtCfDXfSw_0&list=PLy_6D98if3UL
 
 ### Generate code using sqlc
 > make sqlc
+
+### How to migrate database
+```bash
+# 1. Install golang-migrate first
+brew install golang-migrate
+
+# 2. Run make up to start pg database
+make up
+
+# 3. To run a migration
+make migrateup
+
+# 4. To reverse a migration
+make migratedown
+```

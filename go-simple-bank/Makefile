@@ -16,14 +16,17 @@ migratedown:
 migratecreate:
 	migrate create -ext sql -dir db/migration -seq init_schema
 
+# Define a variable to handle both cases
+DOCKER_COMPOSE = $(shell if docker compose version >/dev/null 2>&1; then echo 'docker compose'; else echo 'docker-compose'; fi)
+
 up:
-	docker-compose up -d
+	$(DOCKER_COMPOSE) up -d
 
 down:
-	docker-compose down
+	$(DOCKER_COMPOSE) down
 
 build:
-	docker-compose build
+	$(DOCKER_COMPOSE) build
 
 sqlc:
 	sqlc generate

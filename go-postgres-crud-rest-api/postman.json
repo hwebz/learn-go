@@ -1,0 +1,146 @@
+{
+  "collection": {
+    "info": {
+      "_postman_id": "bf6fa04b-05c4-4314-ac20-fa11fa96f334",
+      "name": "Go REST API",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "updatedAt": "2024-11-06T07:25:04.000Z",
+      "createdAt": "2024-11-06T07:20:11.000Z",
+      "lastUpdatedBy": "9309381",
+      "uid": "9309381-bf6fa04b-05c4-4314-ac20-fa11fa96f334"
+    },
+    "item": [{
+      "name": "Health Checker",
+      "id": "467057c1-0806-48b6-b6c1-a9a734cbf360",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/api/healthchecker",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "healthchecker"]
+        }
+      },
+      "response": [],
+      "uid": "9309381-467057c1-0806-48b6-b6c1-a9a734cbf360"
+    }, {
+      "name": "Get Feedbacks",
+      "id": "f766ee60-1921-42bb-9eb5-f33f8a1a321b",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/api/feedbacks",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "feedbacks"]
+        }
+      },
+      "response": [],
+      "uid": "9309381-f766ee60-1921-42bb-9eb5-f33f8a1a321b"
+    }, {
+      "name": "Add Feedback",
+      "id": "13eec2cb-d7ca-4962-bf8c-9d5a88b946fa",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Ha Manh Do\",\n    \"email\": \"ha@rentredi.com\",\n    \"feedback\": \"I don't have any feedback\",\n    \"rating\": 3.4,\n    \"status\": \"pending\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/feedbacks",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "feedbacks"]
+        }
+      },
+      "response": [],
+      "uid": "9309381-13eec2cb-d7ca-4962-bf8c-9d5a88b946fa"
+    }, {
+      "name": "Get Feedback",
+      "id": "a5af6ecc-74e1-4a44-9ddf-484cce1ff44f",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/api/feedbacks/7ecbe2ce-fcb2-4ca6-a6c7-4266169fcf73",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "feedbacks", "7ecbe2ce-fcb2-4ca6-a6c7-4266169fcf73"]
+        }
+      },
+      "response": [],
+      "uid": "9309381-a5af6ecc-74e1-4a44-9ddf-484cce1ff44f"
+    }, {
+      "name": "Update Feedback",
+      "id": "60fa0638-6664-46eb-9b33-2fbc8cd3efbe",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Ha Manh Do UPDATED\",\n    \"email\": \"ha@rentredi.com\",\n    \"feedback\": \"I don't have any feedback\",\n    \"rating\": 3.4\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/feedbacks/7ecbe2ce-fcb2-4ca6-a6c7-4266169fcf73",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "feedbacks", "7ecbe2ce-fcb2-4ca6-a6c7-4266169fcf73"]
+        }
+      },
+      "response": [],
+      "uid": "9309381-60fa0638-6664-46eb-9b33-2fbc8cd3efbe"
+    }, {
+      "name": "Delete Feedback",
+      "id": "357995e7-f483-4f25-bc04-d24370e7eee6",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/api/feedbacks/7ecbe2ce-fcb2-4ca6-a6c7-4266169fcf73",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "feedbacks", "7ecbe2ce-fcb2-4ca6-a6c7-4266169fcf73"]
+        }
+      },
+      "response": [],
+      "uid": "9309381-357995e7-f483-4f25-bc04-d24370e7eee6"
+    }]
+  }
+}
